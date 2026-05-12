@@ -6,9 +6,18 @@
     <description><![CDATA[
 <h2>Copy Path for Claude Code</h2>
 <p>
-    Copy file and folder path references in the <b>Claude Code <code>@</code>-mention format</b> directly from your IDE.
-    Paste them into <a href="https://docs.anthropic.com/en/docs/claude-code">Claude Code</a> conversations
-    so Claude can instantly locate the exact file and lines you're referring to.
+    Copy file and folder references in Claude Code <code>@</code>-mention format directly from your IDE.
+    Press <kbd>⌥C</kbd> (<kbd>Alt+C</kbd>) or right-click — works in both the editor and the project tree:
+</p>
+<ul>
+    <li>Editor (line selected): <code>@src/auth.ts#L42-68</code></li>
+    <li>Editor (no selection): <code>@src/auth.ts</code></li>
+    <li>Project tree (file): <code>@src/components/Button.tsx</code></li>
+    <li>Project tree (folder): <code>@src/components/</code></li>
+</ul>
+<p>
+    Paste straight into <a href="https://docs.anthropic.com/en/docs/claude-code">Claude Code</a>
+    and it knows exactly which file and lines you mean.
 </p>
 
 <h3>Features</h3>
@@ -17,6 +26,8 @@
     <li>Smart line detection based on editor text selection</li>
     <li>Multi-cursor support — each caret generates a separate reference with line numbers</li>
     <li>Multi-file selection support — select multiple files/folders and copy all paths at once</li>
+    <li>Paths containing spaces are automatically wrapped in double quotes (e.g. <code>@"my file.ts"</code>)</li>
+    <li>Directory paths include a trailing slash to distinguish folders from files (e.g. <code>@src/</code>)</li>
     <li>Optional trailing space after copied references for easy pasting</li>
     <li>Configurable separator for multiple references (space or newline)</li>
     <li>Works from editor context menu, project tree context menu, and keyboard shortcut</li>
@@ -30,9 +41,12 @@
     <tr><td>File (no selection)</td><td><code>@src/utils/auth.ts</code></td></tr>
     <tr><td>File (single line selected)</td><td><code>@src/utils/auth.ts#L42</code></td></tr>
     <tr><td>File (multiple lines selected)</td><td><code>@src/utils/auth.ts#L42-68</code></td></tr>
-    <tr><td>Folder</td><td><code>@src/components</code></td></tr>
-    <tr><td>Multi-cursor (with selections)</td><td><code>@src/utils/auth.ts#L5 @src/utils/auth.ts#L20-25</code></td></tr>
+    <tr><td>File with spaces in path</td><td><code>@"my file.ts"</code></td></tr>
+    <tr><td>File with spaces + line range</td><td><code>@"my file.ts#L42-68"</code></td></tr>
+    <tr><td>Folder</td><td><code>@src/components/</code></td></tr>
+    <tr><td>Folder with spaces in path</td><td><code>@"my components/"</code></td></tr>
     <tr><td>Multi-cursor (carets only)</td><td><code>@src/utils/auth.ts#L5 @src/utils/auth.ts#L42</code></td></tr>
+    <tr><td>Multi-cursor (with selections)</td><td><code>@src/utils/auth.ts#L5-10 @src/utils/auth.ts#L30-35</code></td></tr>
     <tr><td>Multiple files selected</td><td><code>@src/Button.tsx @src/Input.tsx</code></td></tr>
 </table>
 
@@ -47,7 +61,10 @@
 <ol>
     <li>Select lines 10–25 in <code>src/components/Button.tsx</code>, press <kbd>⌥C</kbd> → <code>@src/components/Button.tsx#L10-25</code></li>
     <li>Right-click <code>package.json</code> in the project tree → <code>@package.json</code></li>
-    <li>Right-click <code>src/components</code> folder → <code>@src/components</code></li>
+    <li>Right-click <code>src/components</code> folder → <code>@src/components/</code></li>
+    <li>Right-click <code>my components</code> folder (with spaces) → <code>@"my components/"</code></li>
+    <li>Right-click <code>my file.ts</code> (with spaces) → <code>@"my file.ts"</code></li>
+    <li>Select lines 5–10 in <code>my file.ts</code> (with spaces), press <kbd>⌥C</kbd> → <code>@"my file.ts#L5-10"</code></li>
     <li>Place caret without selecting text, press <kbd>⌥C</kbd> → <code>@src/index.ts</code> (path only)</li>
     <li>Place multiple cursors (<kbd>Alt+Click</kbd>) on lines 5, 20, 42, press <kbd>⌥C</kbd> → <code>@src/utils/auth.ts#L5 @src/utils/auth.ts#L20 @src/utils/auth.ts#L42</code></li>
     <li>Select text at multiple cursors (e.g. lines 5–10 and 30–35), press <kbd>⌥C</kbd> → <code>@src/utils/auth.ts#L5-10 @src/utils/auth.ts#L30-35</code></li>
@@ -71,6 +88,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+<h3>1.2.0</h3>
+<ul>
+    <li>New: Paths containing spaces are automatically wrapped in double quotes (e.g. <code>@"my component.tsx"</code>)</li>
+    <li>New: Directory paths now include a trailing slash to distinguish folders from files (e.g. <code>@src/</code>)</li>
+</ul>
 <h3>1.1.1</h3>
 <ul>
     <li>Fix: Removed bundled kotlin-stdlib to resolve Marketplace upload issue and reduce plugin size</li>

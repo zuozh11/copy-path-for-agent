@@ -52,4 +52,29 @@ class ClaudeReferenceBuilderTest {
     fun `line 1`() {
         assertEquals("@src/Main.kt#L1", ClaudeReferenceBuilder.build("src/Main.kt", 1, 1))
     }
+
+    @Test
+    fun `path with spaces no line`() {
+        assertEquals("@\"my component.tsx\"", ClaudeReferenceBuilder.build("my component.tsx"))
+    }
+
+    @Test
+    fun `path with spaces single line`() {
+        assertEquals("@\"my component.tsx#L5\"", ClaudeReferenceBuilder.build("my component.tsx", 5, 5))
+    }
+
+    @Test
+    fun `path with spaces range`() {
+        assertEquals("@\"my component.tsx#L5-10\"", ClaudeReferenceBuilder.build("my component.tsx", 5, 10))
+    }
+
+    @Test
+    fun `folder path trailing slash no spaces`() {
+        assertEquals("@src/main/", ClaudeReferenceBuilder.build("src/main/"))
+    }
+
+    @Test
+    fun `folder path trailing slash with spaces`() {
+        assertEquals("@\"src/my components/\"", ClaudeReferenceBuilder.build("src/my components/"))
+    }
 }

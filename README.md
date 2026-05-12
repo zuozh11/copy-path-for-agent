@@ -8,6 +8,8 @@ A JetBrains plugin that copies file and folder path references in the [Claude Co
 - Smart line detection based on editor text selection
 - Multi-cursor support — each caret generates a separate reference with line numbers
 - Multi-file selection support — select multiple files/folders and copy all paths at once
+- Paths containing spaces are automatically wrapped in double quotes (e.g. `@"my file.ts"`)
+- Directory paths include a trailing slash to distinguish folders from files (e.g. `@src/`)
 - Optional trailing space after copied references for easy pasting
 - Configurable separator for multiple references (space or newline)
 - Works from editor context menu, project tree context menu, and keyboard shortcut
@@ -21,7 +23,10 @@ A JetBrains plugin that copies file and folder path references in the [Claude Co
 | File (no selection) | `@src/utils/auth.ts` |
 | File (single line selected) | `@src/utils/auth.ts#L42` |
 | File (multiple lines selected) | `@src/utils/auth.ts#L42-68` |
-| Folder | `@src/components` |
+| File with spaces in path | `@"my file.ts"` |
+| File with spaces + line range | `@"my file.ts#L42-68"` |
+| Folder | `@src/components/` |
+| Folder with spaces in path | `@"my components/"` |
 | Multi-cursor (with selections) | `@src/utils/auth.ts#L5 @src/utils/auth.ts#L20-25` |
 | Multi-cursor (carets only) | `@src/utils/auth.ts#L5 @src/utils/auth.ts#L42` |
 | Multiple files selected | `@src/Button.tsx @src/Input.tsx` (separator configurable) |
@@ -59,7 +64,16 @@ Works in both the editor and project tree — the output adapts automatically ba
 @package.json
 
 # Right-click a folder in the project tree
-@src/components
+@src/components/
+
+# Right-click a file with spaces in its name
+@"my file.ts"
+
+# Right-click a folder with spaces in its name
+@"my components/"
+
+# Select lines 5–10 in a file with spaces, press ⌥C
+@"my file.ts#L5-10"
 
 # Place multiple cursors (Alt+Click) on lines 5, 20, 42, press ⌥C
 @src/utils/auth.ts#L5 @src/utils/auth.ts#L20 @src/utils/auth.ts#L42

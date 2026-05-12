@@ -89,7 +89,8 @@ class CopyClaudeReferenceAction : AnAction() {
         if (selectedFiles != null) {
             val references = selectedFiles.mapNotNull { file ->
                 val path = VfsUtilCore.getRelativePath(file, projectDir) ?: file.name
-                ClaudeReferenceBuilder.build(path)
+                val resolvedPath = if (file.isDirectory) "$path/" else path
+                ClaudeReferenceBuilder.build(resolvedPath)
             }
             val combined = references.joinToString(getMultiFileSeparator())
             val output = appendTrailingSpace(combined)
@@ -98,7 +99,8 @@ class CopyClaudeReferenceAction : AnAction() {
         } else {
             val virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
             val relativePath = VfsUtilCore.getRelativePath(virtualFile, projectDir) ?: virtualFile.name
-            val reference = ClaudeReferenceBuilder.build(relativePath)
+            val resolvedPath = if (virtualFile.isDirectory) "$relativePath/" else relativePath
+            val reference = ClaudeReferenceBuilder.build(resolvedPath)
             val output = appendTrailingSpace(reference)
             CopyPasteManager.getInstance().setContents(StringSelection(output))
             ClaudeNotifier.notify(project, reference)
