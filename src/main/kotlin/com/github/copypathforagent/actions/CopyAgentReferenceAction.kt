@@ -1,28 +1,45 @@
-package com.github.copyclaudereference.actions
+package com.github.copypathforagent.actions
 
-import com.github.copyclaudereference.notification.ClaudeNotifier
-import com.github.copyclaudereference.settings.ClaudeSettings
-import com.github.copyclaudereference.util.ClaudeReferenceBuilder
+import com.github.copypathforagent.notification.AgentNotifier
+import com.github.copypathforagent.settings.AgentSettings
+import com.github.copypathforagent.util.AgentReferenceBuilder
+import com.github.copypathforagent.util.ReferenceContext
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VfsUtilCore
 import java.awt.datatransfer.StringSelection
 
-class CopyClaudeReferenceAction : AnAction() {
-
-    private fun appendTrailingSpace(reference: String): String {
-        return if (ClaudeSettings.getInstance().appendTrailingSpace) "$reference " else reference
-    }
+class CopyAgentReferenceAction : AnAction() {
 
     private fun getMultiFileSeparator(): String {
-        return when (ClaudeSettings.getInstance().multiFileSeparator) {
-            ClaudeSettings.MultiFileSeparator.SPACE -> " "
-            ClaudeSettings.MultiFileSeparator.NEWLINE -> "\n"
+        return when (AgentSettings.getInstance().multiFileSeparator) {
+            AgentSettings.MultiFileSeparator.SPACE -> " "
+            AgentSettings.MultiFileSeparator.NEWLINE -> "\n"
         }
+    }
+
+    private fun buildReference(
+        file: VirtualFile,
+        projectDir: VirtualFile,
+        startLine: Int? = null,
+        endLine: Int? = null
+    ): String {
+        val relativePath = VfsUtilCore.getRelativePath(file, projectDir) ?: file.name
+        val absolutePath = file.path
+        val context = ReferenceContext(
+            relativePath = relativePath,
+            absolutePath = absolutePath,
+            fileName = file.name,
+            isDirectory = file.isDirectory,
+            startLine = startLine,
+            endLine = endLine
+        )
+        return AgentReferenceBuilder.build(context, AgentSettings.getInstance().template)
     }
 
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
@@ -47,7 +64,6 @@ class CopyClaudeReferenceAction : AnAction() {
 
             if (hasAnySelection || isMultiCaret) {
                 val virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
-                val relativePath = VfsUtilCore.getRelativePath(virtualFile, projectDir) ?: virtualFile.name
                 val document = editor.document
 
                 val sortedCarets = carets.sortedBy { it.offset }
@@ -61,22 +77,21 @@ class CopyClaudeReferenceAction : AnAction() {
                         if (caret.selectionEnd == document.getLineStartOffset(endLine - 1) && endLine > startLine) {
                             endLine--
                         }
-                        ClaudeReferenceBuilder.build(relativePath, startLine, endLine)
+                        buildReference(virtualFile, projectDir, startLine, endLine)
                     } else {
                         // Caret without selection: use cursor's line number
                         val line = document.getLineNumber(caret.offset) + 1
-                        ClaudeReferenceBuilder.build(relativePath, line, line)
+                        buildReference(virtualFile, projectDir, line, line)
                     }
                 }
 
                 val combined = references.joinToString(getMultiFileSeparator())
-                val output = appendTrailingSpace(combined)
-                CopyPasteManager.getInstance().setContents(StringSelection(output))
+                CopyPasteManager.getInstance().setContents(StringSelection(combined))
 
                 if (references.size > 1) {
-                    ClaudeNotifier.notify(project, "${references.size} references copied")
+                    AgentNotifier.notify(project, "${references.size} references copied")
                 } else {
-                    ClaudeNotifier.notify(project, references.first())
+                    AgentNotifier.notify(project, references.first())
                 }
                 return
             }
@@ -88,22 +103,16 @@ class CopyClaudeReferenceAction : AnAction() {
 
         if (selectedFiles != null) {
             val references = selectedFiles.mapNotNull { file ->
-                val path = VfsUtilCore.getRelativePath(file, projectDir) ?: file.name
-                val resolvedPath = if (file.isDirectory) "$path/" else path
-                ClaudeReferenceBuilder.build(resolvedPath)
+                buildReference(file, projectDir)
             }
             val combined = references.joinToString(getMultiFileSeparator())
-            val output = appendTrailingSpace(combined)
-            CopyPasteManager.getInstance().setContents(StringSelection(output))
-            ClaudeNotifier.notify(project, "${references.size} paths copied")
+            CopyPasteManager.getInstance().setContents(StringSelection(combined))
+            AgentNotifier.notify(project, "${references.size} paths copied")
         } else {
             val virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
-            val relativePath = VfsUtilCore.getRelativePath(virtualFile, projectDir) ?: virtualFile.name
-            val resolvedPath = if (virtualFile.isDirectory) "$relativePath/" else relativePath
-            val reference = ClaudeReferenceBuilder.build(resolvedPath)
-            val output = appendTrailingSpace(reference)
-            CopyPasteManager.getInstance().setContents(StringSelection(output))
-            ClaudeNotifier.notify(project, reference)
+            val reference = buildReference(virtualFile, projectDir)
+            CopyPasteManager.getInstance().setContents(StringSelection(reference))
+            AgentNotifier.notify(project, reference)
         }
     }
 }

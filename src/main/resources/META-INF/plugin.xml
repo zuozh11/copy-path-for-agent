@@ -1,140 +1,78 @@
 <idea-plugin>
-    <id>com.github.copypathforclaudecode</id>
-    <name>Copy Path for Claude Code</name>
-    <vendor email="teppasit.w@gmail.com" url="https://github.com/inwpasit619/copy-path-for-claude-code">Teppasit</vendor>
+    <id>com.github.copypathforagent</id>
+    <name>Copy Path for Agent</name>
+    <vendor email="zuozh11@users.noreply.github.com" url="https://github.com/zuozh11/copy-path-for-agent">zuozh11</vendor>
 
     <description><![CDATA[
-<h2>Copy Path for Claude Code</h2>
+<h2>Copy Path for Agent</h2>
 <p>
-    Copy file and folder references in Claude Code <code>@</code>-mention format directly from your IDE.
-    Press <kbd>⌥C</kbd> (<kbd>Alt+C</kbd>) or right-click — works in both the editor and the project tree:
+    Copy file and folder references from JetBrains IDEs in configurable agent-friendly formats.
+    Use the built-in <b>claudecode</b> and <b>codex</b> presets, or define your own template.
 </p>
 <ul>
-    <li>Editor (line selected): <code>@src/auth.ts#L42-68</code></li>
-    <li>Editor (no selection): <code>@src/auth.ts</code></li>
-    <li>Project tree (file): <code>@src/components/Button.tsx</code></li>
-    <li>Project tree (folder): <code>@src/components/</code></li>
-</ul>
-<p>
-    Paste straight into <a href="https://docs.anthropic.com/en/docs/claude-code">Claude Code</a>
-    and it knows exactly which file and lines you mean.
-</p>
-
-<h3>Features</h3>
-<ul>
-    <li>Copy file or folder references in <code>@path/to/file#Lx-y</code> format</li>
-    <li>Smart line detection based on editor text selection</li>
-    <li>Multi-cursor support — each caret generates a separate reference with line numbers</li>
-    <li>Multi-file selection support — select multiple files/folders and copy all paths at once</li>
-    <li>Paths containing spaces are automatically wrapped in double quotes (e.g. <code>@"my file.ts"</code>)</li>
-    <li>Directory paths include a trailing slash to distinguish folders from files (e.g. <code>@src/</code>)</li>
-    <li>Optional trailing space after copied references for easy pasting</li>
-    <li>Configurable separator for multiple references (space or newline)</li>
-    <li>Works from editor context menu, project tree context menu, and keyboard shortcut</li>
-    <li>Configurable balloon notification with adjustable duration</li>
-    <li>Compatible with all JetBrains IDEs</li>
+    <li>Editor selections include line numbers based on the selected text.</li>
+    <li>Multiple carets generate one reference per caret.</li>
+    <li>Project tree multi-selection copies all selected files and folders.</li>
+    <li>Directory slashes are controlled by template variables such as <code>{directorySlash}</code>.</li>
+    <li>Multiple references can be separated by a space or newline.</li>
+    <li>Templates can use variables such as <code>{relativePath}</code>, <code>{absolutePath}</code>, <code>{directorySlash}</code>, <code>{claudeReference}</code>, and <code>{codexTarget}</code>.</li>
 </ul>
 
-<h3>Reference Format</h3>
+<h3>Presets</h3>
 <table>
-    <tr><th>Context</th><th>Output</th></tr>
-    <tr><td>File (no selection)</td><td><code>@src/utils/auth.ts</code></td></tr>
-    <tr><td>File (single line selected)</td><td><code>@src/utils/auth.ts#L42</code></td></tr>
-    <tr><td>File (multiple lines selected)</td><td><code>@src/utils/auth.ts#L42-68</code></td></tr>
-    <tr><td>File with spaces in path</td><td><code>@"my file.ts"</code></td></tr>
-    <tr><td>File with spaces + line range</td><td><code>@"my file.ts#L42-68"</code></td></tr>
-    <tr><td>Folder</td><td><code>@src/components/</code></td></tr>
-    <tr><td>Folder with spaces in path</td><td><code>@"my components/"</code></td></tr>
-    <tr><td>Multi-cursor (carets only)</td><td><code>@src/utils/auth.ts#L5 @src/utils/auth.ts#L42</code></td></tr>
-    <tr><td>Multi-cursor (with selections)</td><td><code>@src/utils/auth.ts#L5-10 @src/utils/auth.ts#L30-35</code></td></tr>
-    <tr><td>Multiple files selected</td><td><code>@src/Button.tsx @src/Input.tsx</code></td></tr>
+    <tr><th>Preset</th><th>Output</th></tr>
+    <tr><td>claudecode</td><td><code>@src/utils/auth.ts#L42-68</code></td></tr>
+    <tr><td>codex</td><td><code>[auth.ts:42-68](/absolute/path/src/utils/auth.ts:42)</code></td></tr>
 </table>
 
 <h3>How to Use</h3>
 <ul>
-    <li><b>Editor context menu</b> — Right-click in any editor → <i>Copy Path for Claude Code</i>. The reference includes line numbers based on your current text selection.</li>
-    <li><b>Project tree context menu</b> — Right-click any file or folder in the Project tool window → <i>Copy Path for Claude Code</i>. Copies the relative path without line numbers.</li>
-    <li><b>Keyboard shortcut</b> — Press <kbd>Alt+C</kbd> (<kbd>⌥C</kbd> on macOS). Works in both the editor and project tree; the output adapts automatically based on focus and selection.</li>
+    <li><b>Editor context menu</b> - Right-click in any editor and choose <i>Copy Path for Agent</i>.</li>
+    <li><b>Project tree context menu</b> - Right-click any file or folder in the Project tool window and choose <i>Copy Path for Agent</i>.</li>
+    <li><b>Keyboard shortcut</b> - Press <kbd>Alt+C</kbd> (<kbd>Option+C</kbd> on macOS).</li>
 </ul>
-
-<h3>Examples</h3>
-<ol>
-    <li>Select lines 10–25 in <code>src/components/Button.tsx</code>, press <kbd>⌥C</kbd> → <code>@src/components/Button.tsx#L10-25</code></li>
-    <li>Right-click <code>package.json</code> in the project tree → <code>@package.json</code></li>
-    <li>Right-click <code>src/components</code> folder → <code>@src/components/</code></li>
-    <li>Right-click <code>my components</code> folder (with spaces) → <code>@"my components/"</code></li>
-    <li>Right-click <code>my file.ts</code> (with spaces) → <code>@"my file.ts"</code></li>
-    <li>Select lines 5–10 in <code>my file.ts</code> (with spaces), press <kbd>⌥C</kbd> → <code>@"my file.ts#L5-10"</code></li>
-    <li>Place caret without selecting text, press <kbd>⌥C</kbd> → <code>@src/index.ts</code> (path only)</li>
-    <li>Place multiple cursors (<kbd>Alt+Click</kbd>) on lines 5, 20, 42, press <kbd>⌥C</kbd> → <code>@src/utils/auth.ts#L5 @src/utils/auth.ts#L20 @src/utils/auth.ts#L42</code></li>
-    <li>Select text at multiple cursors (e.g. lines 5–10 and 30–35), press <kbd>⌥C</kbd> → <code>@src/utils/auth.ts#L5-10 @src/utils/auth.ts#L30-35</code></li>
-</ol>
 
 <h3>Settings</h3>
-<p>
-    <b>Settings → Tools → Copy Path for Claude Code</b>
-</p>
+<p><b>Settings - Tools - Copy Path for Agent</b></p>
 <ul>
-    <li><b>Append trailing space</b> — Add a space after the copied reference for easy pasting (default: on)</li>
-    <li><b>Multiple references separator</b> — Separator between references when copying multiple files or multi-cursor selections: Space or Newline (default: Space)</li>
-    <li><b>Show notification after copy</b> — Toggle balloon notification on/off (default: enabled)</li>
-    <li><b>Notification duration</b> — How long the notification stays visible, 1–30 seconds (default: 3s)</li>
+    <li><b>Preset</b> - Choose <code>claudecode</code> or <code>codex</code> to fill the template.</li>
+    <li><b>Template</b> - Customize the copied reference with documented variables.</li>
+    <li><b>Multiple references separator</b> - Space or newline.</li>
+    <li><b>Notification</b> - Toggle copy notifications and set their duration.</li>
 </ul>
-
-<h3>Compatibility</h3>
-<p>
-    Works with <b>all JetBrains IDEs</b> (2024.1+): IntelliJ IDEA, WebStorm, PyCharm, GoLand, PhpStorm, Rider, CLion, RustRover, DataGrip, Android Studio, and more.
-</p>
     ]]></description>
 
     <change-notes><![CDATA[
-<h3>1.2.0</h3>
-<ul>
-    <li>New: Paths containing spaces are automatically wrapped in double quotes (e.g. <code>@"my component.tsx"</code>)</li>
-    <li>New: Directory paths now include a trailing slash to distinguish folders from files (e.g. <code>@src/</code>)</li>
-</ul>
-<h3>1.1.1</h3>
-<ul>
-    <li>Fix: Removed bundled kotlin-stdlib to resolve Marketplace upload issue and reduce plugin size</li>
-</ul>
-<h3>1.1.0</h3>
-<ul>
-    <li>New: Multi-cursor support — each caret generates a separate reference with line numbers</li>
-    <li>New: Optional trailing space after copied references for easy pasting</li>
-    <li>New: Configurable separator for multiple references — choose between Space or Newline when copying multiple files or multi-cursor selections</li>
-    <li>Reorganized settings panel with "Copy Format" and "Notification" sections</li>
-</ul>
 <h3>1.0.0</h3>
 <ul>
-    <li>Initial release</li>
-    <li>Copy file and folder path in <code>@path#Lstart-end</code> format for Claude Code</li>
-    <li>Editor context menu, project tree context menu, and <kbd>Alt+C</kbd> keyboard shortcut</li>
-    <li>Configurable balloon notification with adjustable duration</li>
-    <li>Settings page under <b>Tools → Copy Path for Claude Code</b></li>
-    <li>Compatible with all JetBrains IDEs (2024.1+)</li>
+    <li>Forked from Copy Path for Claude Code and renamed to Copy Path for Agent.</li>
+    <li>Added configurable templates with documented variables.</li>
+    <li>Added claudecode and codex presets.</li>
+    <li>Removed hidden path suffix toggles; add <code>{space}</code> or <code>{directorySlash}</code> to the template if needed.</li>
+    <li>Kept editor selection, multi-caret, multi-file, folder, separator, shortcut, and notification features.</li>
 </ul>
     ]]></change-notes>
 
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <notificationGroup id="Copy Path for Claude Code"
+        <notificationGroup id="Copy Path for Agent"
                            displayType="BALLOON"
                            isLogByDefault="false"/>
         <applicationService
-                serviceImplementation="com.github.copyclaudereference.settings.ClaudeSettings"/>
+                serviceImplementation="com.github.copypathforagent.settings.AgentSettings"/>
         <applicationConfigurable
                 parentId="tools"
-                instance="com.github.copyclaudereference.settings.ClaudeSettingsConfigurable"
-                id="com.github.copyclaudereference.settings"
-                displayName="Copy Path for Claude Code"/>
+                instance="com.github.copypathforagent.settings.AgentSettingsConfigurable"
+                id="com.github.copypathforagent.settings"
+                displayName="Copy Path for Agent"/>
     </extensions>
 
     <actions>
-        <action id="CopyPathForClaudeCode"
-                class="com.github.copyclaudereference.actions.CopyClaudeReferenceAction"
-                text="Copy Path for Claude Code"
-                description="Copy file path in @path#Lx-y format for Claude Code"
+        <action id="CopyPathForAgent"
+                class="com.github.copypathforagent.actions.CopyAgentReferenceAction"
+                text="Copy Path for Agent"
+                description="Copy file path references with configurable agent templates"
                 icon="/icons/claude.svg">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>

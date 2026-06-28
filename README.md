@@ -1,109 +1,92 @@
-# Copy Path for Claude Code
+# Copy Path for Agent
 
-A JetBrains plugin that copies file and folder path references in the [Claude Code](https://docs.anthropic.com/en/docs/claude-code) `@`-mention format — ready to paste into Claude Code conversations.
+A JetBrains plugin that copies file and folder references in configurable formats for coding agents.
+
+It is forked from [Copy Path for Claude Code](https://github.com/inwpasit619/copy-path-for-claude-code) and keeps the original editor, project tree, multi-caret, multi-file, separator, shortcut, and notification workflow while replacing the fixed Claude Code formatter with templates.
 
 ## Features
 
-- Copy file or folder references in `@path/to/file#Lx-y` format
-- Smart line detection based on editor text selection
-- Multi-cursor support — each caret generates a separate reference with line numbers
-- Multi-file selection support — select multiple files/folders and copy all paths at once
-- Paths containing spaces are automatically wrapped in double quotes (e.g. `@"my file.ts"`)
-- Directory paths include a trailing slash to distinguish folders from files (e.g. `@src/`)
-- Optional trailing space after copied references for easy pasting
-- Configurable separator for multiple references (space or newline)
-- Works from editor context menu, project tree context menu, and keyboard shortcut
-- Configurable balloon notification with adjustable duration
-- Compatible with all JetBrains IDEs
+- Copy references from the editor, project tree, or the `Alt+C` / `Option+C` shortcut.
+- Include line numbers for editor selections and multi-caret positions.
+- Copy multiple selected files or folders.
+- Choose a separator for multiple references: space or newline.
+- Use the built-in `claudecode` and `codex` presets.
+- Customize the copied text with template variables.
+- Add trailing spaces or directory slashes from the template instead of separate hidden toggles.
+- Configure copy notifications and notification duration.
 
-## Reference Format
+## Presets
 
-| Context | Output |
+| Preset | Template | Example |
+|---|---|---|
+| `claudecode` | `{claudeReference}` | `@src/utils/auth.ts#L42-68` |
+| `codex` | `[{codexLabel}]({codexTarget})` | `[auth.ts:42-68](/Users/me/project/src/utils/auth.ts:42)` |
+
+The `codex` preset is designed for Codex desktop/app-style Markdown file links. For Codex CLI prompt mentions, a useful custom template is:
+
+```text
+@{relativePath} {lineText}
+```
+
+## Template Variables
+
+| Variable | Description |
 |---|---|
-| File (no selection) | `@src/utils/auth.ts` |
-| File (single line selected) | `@src/utils/auth.ts#L42` |
-| File (multiple lines selected) | `@src/utils/auth.ts#L42-68` |
-| File with spaces in path | `@"my file.ts"` |
-| File with spaces + line range | `@"my file.ts#L42-68"` |
-| Folder | `@src/components/` |
-| Folder with spaces in path | `@"my components/"` |
-| Multi-cursor (with selections) | `@src/utils/auth.ts#L5 @src/utils/auth.ts#L20-25` |
-| Multi-cursor (carets only) | `@src/utils/auth.ts#L5 @src/utils/auth.ts#L42` |
-| Multiple files selected | `@src/Button.tsx @src/Input.tsx` (separator configurable) |
+| `{relativePath}` | Project-relative path exactly as provided by the IDE. |
+| `{absolutePath}` | Absolute local path exactly as provided by the IDE. |
+| `{relativePathWithDirectorySlash}` | Project-relative path plus `{directorySlash}`. |
+| `{absolutePathWithDirectorySlash}` | Absolute local path plus `{directorySlash}`. |
+| `{fileName}` | The file or folder name only. |
+| `{isDirectory}` | `true` for folders, `false` for files. |
+| `{directorySlash}` | `/` for folders, empty for files. |
+| `{startLine}` | The 1-based start line, or empty when no line is selected. |
+| `{endLine}` | The 1-based end line, or empty when no line is selected. |
+| `{lineRange}` | The selected line or line range, such as `5` or `5-10`. |
+| `{lineText}` | Human-readable line text, such as `line 5` or `lines 5-10`. |
+| `{claudeLineSuffix}` | Claude Code line suffix, such as `#L5` or `#L5-10`. |
+| `{claudeReference}` | Complete Claude Code reference, such as `@src/App.kt#L5`. |
+| `{claudeReferenceWithDirectorySlash}` | Claude Code reference using `{relativePathWithDirectorySlash}`. |
+| `{codexLabel}` | Markdown link label for Codex, such as `App.kt:5-10`. |
+| `{codexTarget}` | Markdown link target for Codex, using the absolute path and start line. |
+| `{codexTargetWithDirectorySlash}` | Markdown link target for Codex using `{absolutePathWithDirectorySlash}`. |
+| `{space}` | A literal space, useful when you want a trailing space. |
 
 ## Usage
 
 ### Editor Context Menu
 
-Right-click in any editor → **Copy Path for Claude Code**
+Right-click in any editor and choose **Copy Path for Agent**.
 
-The output includes line numbers based on your current text selection. If nothing is selected, only the file path is copied.
+When text is selected, the output includes the selected line range. With multiple carets, each caret generates a separate reference.
 
 ### Project Tree Context Menu
 
-Right-click any file or folder in the Project tool window → **Copy Path for Claude Code**
-
-Copies the relative path without line numbers.
+Right-click files or folders in the Project tool window and choose **Copy Path for Agent**.
 
 ### Keyboard Shortcut
 
-Press <kbd>Alt+C</kbd> (<kbd>⌥C</kbd> on macOS).
-
-Works in both the editor and project tree — the output adapts automatically based on focus and selection.
-
-## Examples
-
-```
-# Select lines 10–25 in src/components/Button.tsx, then press ⌥C
-@src/components/Button.tsx#L10-25
-
-# Place caret without selecting text, press ⌥C
-@src/utils/auth.ts
-
-# Right-click a file in the project tree
-@package.json
-
-# Right-click a folder in the project tree
-@src/components/
-
-# Right-click a file with spaces in its name
-@"my file.ts"
-
-# Right-click a folder with spaces in its name
-@"my components/"
-
-# Select lines 5–10 in a file with spaces, press ⌥C
-@"my file.ts#L5-10"
-
-# Place multiple cursors (Alt+Click) on lines 5, 20, 42, press ⌥C
-@src/utils/auth.ts#L5 @src/utils/auth.ts#L20 @src/utils/auth.ts#L42
-
-# Select text at multiple cursors (e.g. lines 5–10 and 30–35), press ⌥C
-@src/utils/auth.ts#L5-10 @src/utils/auth.ts#L30-35
-
-# Select multiple files in the project tree, then press ⌥C
-@src/components/Button.tsx @src/components/Input.tsx @src/utils/auth.ts
-```
+Press <kbd>Alt+C</kbd> or <kbd>Option+C</kbd> on macOS.
 
 ## Settings
 
-**Settings → Tools → Copy Path for Claude Code**
+Open **Settings -> Tools -> Copy Path for Agent**.
 
 | Setting | Description | Default |
 |---|---|---|
-| Append trailing space | Add a space after the copied reference for easy pasting | Enabled |
-| Multiple references separator | Separator between references when copying multiple files or multi-cursor selections: Space or Newline | Space |
-| Show notification after copy | Toggle balloon notification on/off | Enabled |
-| Notification duration (seconds) | How long the notification stays visible (1–30s) | 3 seconds |
+| Preset | Fill the template with a built-in preset | `claudecode` |
+| Template | Template used for copied references | `{claudeReference}` |
+| Multiple references separator | Separator for multi-file or multi-caret copies | Space |
+| Show notification after copy | Toggle balloon notification | Enabled |
+| Notification duration | How long notifications stay visible | 3 seconds |
+
+## Build
+
+```bash
+./gradlew test buildPlugin
+```
+
+The plugin ZIP is generated under `build/distributions/`.
 
 ## Compatibility
 
-Works with **all JetBrains IDEs** (2024.1+):
-
-IntelliJ IDEA · WebStorm · PyCharm · GoLand · PhpStorm · Rider · CLion · RustRover · DataGrip · Android Studio
-
-## Additional Info
-
-- **Issue Tracker**: [GitHub Issues](https://github.com/inwpasit619/copy-path-for-claude-code/issues)
-- **Documentation**: [GitHub Repository](https://github.com/inwpasit619/copy-path-for-claude-code)
-- **License**: [MIT](https://github.com/inwpasit619/copy-path-for-claude-code/blob/main/LICENSE)
+JetBrains IDEs 2024.1+.

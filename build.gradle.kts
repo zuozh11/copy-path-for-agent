@@ -37,6 +37,18 @@ java {
     }
 }
 
+intellijPlatform {
+    pluginVerification {
+        ides {
+            ide("IC", providers.gradleProperty("platformVersion").get())
+        }
+    }
+
+    publishing {
+        token.set(providers.environmentVariable("PUBLISH_TOKEN"))
+    }
+}
+
 tasks {
     patchPluginXml {
         sinceBuild.set("241")
