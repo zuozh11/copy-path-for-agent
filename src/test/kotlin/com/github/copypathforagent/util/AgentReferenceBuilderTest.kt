@@ -22,7 +22,7 @@ class AgentReferenceBuilderTest {
     }
 
     @Test
-    fun `codex app profile uses file uri and start line variables`() {
+    fun `codex app profile uses markdown file link with line range target`() {
         val context = ReferenceContext(
             relativePath = "src/Main.kt",
             absolutePath = "/Users/example/project/src/Main.kt",
@@ -32,13 +32,13 @@ class AgentReferenceBuilderTest {
         )
 
         assertEquals(
-            "file:///Users/example/project/src/Main.kt#L5",
+            "[Main.kt](/Users/example/project/src/Main.kt:5-10)",
             AgentReferenceBuilder.build(context, FormatPreset.CODEX.template)
         )
     }
 
     @Test
-    fun `codex app profile omits line marker when start line is empty`() {
+    fun `codex app profile omits line label and target when line is empty`() {
         val context = ReferenceContext(
             relativePath = "src/Main.kt",
             absolutePath = "/Users/example/project/src/Main.kt",
@@ -46,13 +46,13 @@ class AgentReferenceBuilderTest {
         )
 
         assertEquals(
-            "file:///Users/example/project/src/Main.kt",
+            "[Main.kt](/Users/example/project/src/Main.kt)",
             AgentReferenceBuilder.build(context, FormatPreset.CODEX.template)
         )
     }
 
     @Test
-    fun `codex app profile encodes spaces in file uri`() {
+    fun `codex app profile keeps markdown file link target as absolute path`() {
         val context = ReferenceContext(
             relativePath = "src/My Component.kt",
             absolutePath = "/Users/example/My Project/src/My Component.kt",
@@ -62,7 +62,7 @@ class AgentReferenceBuilderTest {
         )
 
         assertEquals(
-            "file:///Users/example/My%20Project/src/My%20Component.kt#L5",
+            "[My Component.kt](/Users/example/My Project/src/My Component.kt:5-10)",
             AgentReferenceBuilder.build(context, FormatPreset.CODEX.template)
         )
     }
@@ -78,7 +78,7 @@ class AgentReferenceBuilderTest {
         )
 
         assertEquals(
-            "file:///Users/zuozhi/workspace/Lanyou/QX_SRM/df-mdf-prd-productive/df-mdf-prd-productive-feignimpl/src/main/java/com/szlanyou/cloud/productive/feignclient/common/DbToolsVO.java#L76",
+            "[DbToolsVO.java](/Users/zuozhi/workspace/Lanyou/QX_SRM/df-mdf-prd-productive/df-mdf-prd-productive-feignimpl/src/main/java/com/szlanyou/cloud/productive/feignclient/common/DbToolsVO.java:76-77)",
             AgentReferenceBuilder.build(context, FormatPreset.CODEX.template)
         )
     }

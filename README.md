@@ -4,7 +4,7 @@ A JetBrains plugin that copies file and folder references in configurable format
 
 It is forked from [Copy Path for Claude Code](https://github.com/inwpasit619/copy-path-for-claude-code) and keeps the original editor, project tree, multi-caret, multi-file, shortcut, and notification workflow while replacing the fixed Claude Code formatter with switchable profiles and templates.
 
-Current version: `1.1.2`.
+Current version: `1.1.3`.
 
 ## Features
 
@@ -22,9 +22,9 @@ Current version: `1.1.2`.
 | Profile | Template | Example |
 |---|---|---|
 | `Claude Code` | `@{relativePath}{{#lineRange}}#L{lineRange}{{/lineRange}}` | `@src/utils/auth.ts#L42-68` |
-| `Codex App` | `{fileUri}{{#startLine}}#L{startLine}{{/startLine}}` | `file:///Users/me/project/src/utils/auth.ts#L42` |
+| `Codex App` | `[{fileName}]({absolutePath}{{#lineRange}}:{lineRange}{{/lineRange}})` | `[auth.ts](/Users/me/project/src/utils/auth.ts:42-68)` |
 
-The `Codex App` profile uses local `file://` URIs because Codex can open those file targets reliably. Markdown links such as `[App.kt:42](/absolute/path/App.kt:42)` may look tidy in a prompt, but they are not dependable for clickable local preview in Codex.
+The `Codex App` profile uses Markdown file links so Codex renders a blue clickable file reference. For selected ranges, the link target includes the full line range.
 
 For Codex CLI prompt mentions, a useful custom template is:
 
@@ -54,7 +54,7 @@ The text inside an optional section is output only when the named variable is no
 | `{lineRange}` | The selected line or line range, such as `5` or `5-10`. |
 | `{fileUri}` | Local file URI, such as `file:///Users/me/project/src/App.kt`. |
 
-When there is no editor caret or selection line, line variables are empty. The built-in profiles wrap line markers in optional sections, so copying a whole file does not leave a dangling `#L`.
+When there is no editor caret or selection line, line variables are empty. The built-in profiles wrap line markers and line targets in optional sections, so copying a whole file does not leave a dangling line suffix.
 
 ## Usage
 

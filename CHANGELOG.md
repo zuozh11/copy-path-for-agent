@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.3
+
+- Changed the `Codex App` built-in profile to output Markdown file links that render as blue clickable references in Codex.
+- Kept the link label to the file name and put the selected line or line range in the link target.
+
 ## 1.1.2
 
 - Fixed a crash when switching profiles from the status bar popup.

@@ -130,7 +130,7 @@ class AgentSettings : PersistentStateComponent<AgentSettings.State> {
     }
 
     companion object {
-        private const val CURRENT_PROFILE_SCHEMA_VERSION = 5
+        private const val CURRENT_PROFILE_SCHEMA_VERSION = 6
 
         val FormatPreset.profileId: String
             get() = when (this) {

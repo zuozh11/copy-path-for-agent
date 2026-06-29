@@ -12,7 +12,7 @@ data class ReferenceContext(
 
 enum class FormatPreset(val displayName: String, val template: String) {
     CLAUDE_CODE("Claude Code", "@{relativePath}{{#lineRange}}#L{lineRange}{{/lineRange}}"),
-    CODEX("Codex App", "{fileUri}{{#startLine}}#L{startLine}{{/startLine}}")
+    CODEX("Codex App", "[{fileName}]({absolutePath}{{#lineRange}}:{lineRange}{{/lineRange}})")
 }
 
 data class TemplateVariable(
