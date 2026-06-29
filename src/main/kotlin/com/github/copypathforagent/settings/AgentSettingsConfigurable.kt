@@ -66,7 +66,8 @@ class AgentSettingsConfigurable : Configurable {
 
         val variableHelp = AgentReferenceBuilder.templateVariables.joinToString("<br>") {
             "<code>{${it.name}}</code> - ${templateVariableDescription(it.name, it.description)}"
-        }
+        } + "<br><code>{{#startLine}}#L{startLine}{{/startLine}}</code> - " +
+                AgentBundle.message("settings.template.optionalSection")
 
         val panel = panel {
             group(AgentBundle.message("settings.group.profile")) {

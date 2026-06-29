@@ -14,6 +14,14 @@ class AgentReferenceBuilderTest {
     }
 
     @Test
+    fun `claude code profile omits line marker when line range is empty`() {
+        assertEquals(
+            "@src/Main.kt",
+            AgentReferenceBuilder.build("src/Main.kt")
+        )
+    }
+
+    @Test
     fun `codex app profile uses file uri and start line variables`() {
         val context = ReferenceContext(
             relativePath = "src/Main.kt",
@@ -25,6 +33,20 @@ class AgentReferenceBuilderTest {
 
         assertEquals(
             "file:///Users/example/project/src/Main.kt#L5",
+            AgentReferenceBuilder.build(context, FormatPreset.CODEX.template)
+        )
+    }
+
+    @Test
+    fun `codex app profile omits line marker when start line is empty`() {
+        val context = ReferenceContext(
+            relativePath = "src/Main.kt",
+            absolutePath = "/Users/example/project/src/Main.kt",
+            fileName = "Main.kt"
+        )
+
+        assertEquals(
+            "file:///Users/example/project/src/Main.kt",
             AgentReferenceBuilder.build(context, FormatPreset.CODEX.template)
         )
     }
@@ -77,6 +99,18 @@ class AgentReferenceBuilderTest {
                 context,
                 "{relativeDirectory} | {absoluteDirectory} | {fileName} | {startLine} | {endLine} | {lineRange} | {fileUri}"
             )
+        )
+    }
+
+    @Test
+    fun `custom template optional sections render only when variable is not empty`() {
+        assertEquals(
+            "src/Main.kt:5",
+            AgentReferenceBuilder.build("src/Main.kt", startLine = 5, template = "{relativePath}{{#startLine}}:{startLine}{{/startLine}}")
+        )
+        assertEquals(
+            "src/Main.kt",
+            AgentReferenceBuilder.build("src/Main.kt", template = "{relativePath}{{#startLine}}:{startLine}{{/startLine}}")
         )
     }
 }

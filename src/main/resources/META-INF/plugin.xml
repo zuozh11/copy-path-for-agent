@@ -45,8 +45,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
-<h3>1.1.1</h3>
+<h3>1.1.2</h3>
 <ul>
+    <li>Fixed a status bar profile switching crash on IntelliJ Platform builds where final popup choice is represented as null.</li>
+    <li>Added optional template sections such as <code>{{#startLine}}#L{startLine}{{/startLine}}</code> so default profiles do not leave dangling line markers when no line is available.</li>
     <li>Reduced template variables to the minimal generic set: paths, directories, file name, line numbers, line range, and local file URI.</li>
     <li>Removed derived variables such as file extension, extensionless file name, quoted paths, readable line text, and preformatted line suffixes.</li>
     <li>Built-in profiles now compose Codex App and Claude Code output from the same generic variables.</li>

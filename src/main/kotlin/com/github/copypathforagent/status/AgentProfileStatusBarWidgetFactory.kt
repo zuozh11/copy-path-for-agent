@@ -58,7 +58,7 @@ private class AgentProfileStatusBarWidget : StatusBarWidget, StatusBarWidget.Mul
         ) {
             override fun getTextFor(value: AgentSettings.Profile): String = value.name
 
-            override fun onChosen(selectedValue: AgentSettings.Profile, finalChoice: Boolean): PopupStep<*> {
+            override fun onChosen(selectedValue: AgentSettings.Profile, finalChoice: Boolean): PopupStep<*>? {
                 settings.setActiveProfile(selectedValue.id)
                 statusBar?.updateWidget(ID)
                 return FINAL_CHOICE

@@ -11,8 +11,8 @@ data class ReferenceContext(
 )
 
 enum class FormatPreset(val displayName: String, val template: String) {
-    CLAUDE_CODE("Claude Code", "@{relativePath}#L{lineRange}"),
-    CODEX("Codex App", "{fileUri}#L{startLine}")
+    CLAUDE_CODE("Claude Code", "@{relativePath}{{#lineRange}}#L{lineRange}{{/lineRange}}"),
+    CODEX("Codex App", "{fileUri}{{#startLine}}#L{startLine}{{/startLine}}")
 }
 
 data class TemplateVariable(
@@ -67,7 +67,13 @@ object AgentReferenceBuilder {
             "fileUri" to fileUri(context)
         )
 
-        return variables.entries.fold(template) { rendered, (name, value) ->
+        val withOptionalSections = optionalSectionRegex.replace(template) { match ->
+            val name = match.groupValues[1]
+            val body = match.groupValues[2]
+            if (variables[name].orEmpty().isNotEmpty()) body else ""
+        }
+
+        return variables.entries.fold(withOptionalSections) { rendered, (name, value) ->
             rendered.replace("{$name}", value)
         }
     }
@@ -85,4 +91,9 @@ object AgentReferenceBuilder {
 
     private fun String.parentPath(): String =
         substringBeforeLast('/', "")
+
+    private val optionalSectionRegex = Regex(
+        """\{\{#([A-Za-z][A-Za-z0-9]*)}}(.*?)\{\{/\1}}""",
+        RegexOption.DOT_MATCHES_ALL
+    )
 }

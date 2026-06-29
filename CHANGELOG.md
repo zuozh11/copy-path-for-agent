@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2
+
+- Fixed a crash when switching profiles from the status bar popup.
+- Added optional template sections, for example `{{#startLine}}#L{startLine}{{/startLine}}`.
+- Updated built-in profile templates so whole-file copies do not leave a dangling `#L`.
+
 ## 1.1.1
 
 - Added switchable copy profiles.

@@ -4,7 +4,7 @@ A JetBrains plugin that copies file and folder references in configurable format
 
 It is forked from [Copy Path for Claude Code](https://github.com/inwpasit619/copy-path-for-claude-code) and keeps the original editor, project tree, multi-caret, multi-file, shortcut, and notification workflow while replacing the fixed Claude Code formatter with switchable profiles and templates.
 
-Current version: `1.1.1`.
+Current version: `1.1.2`.
 
 ## Features
 
@@ -21,8 +21,8 @@ Current version: `1.1.1`.
 
 | Profile | Template | Example |
 |---|---|---|
-| `Claude Code` | `@{relativePath}#L{lineRange}` | `@src/utils/auth.ts#L42-68` |
-| `Codex App` | `{fileUri}#L{startLine}` | `file:///Users/me/project/src/utils/auth.ts#L42` |
+| `Claude Code` | `@{relativePath}{{#lineRange}}#L{lineRange}{{/lineRange}}` | `@src/utils/auth.ts#L42-68` |
+| `Codex App` | `{fileUri}{{#startLine}}#L{startLine}{{/startLine}}` | `file:///Users/me/project/src/utils/auth.ts#L42` |
 
 The `Codex App` profile uses local `file://` URIs because Codex can open those file targets reliably. Markdown links such as `[App.kt:42](/absolute/path/App.kt:42)` may look tidy in a prompt, but they are not dependable for clickable local preview in Codex.
 
@@ -34,7 +34,13 @@ For Codex CLI prompt mentions, a useful custom template is:
 
 ## Template Variables
 
-Templates are plain string replacement. There is no conditional syntax, and literal spaces, punctuation, quotes, slashes, and `#L` prefixes should be typed directly into the template.
+Templates support plain variable replacement and one small optional-section syntax:
+
+```text
+{{#variable}}text{{/variable}}
+```
+
+The text inside an optional section is output only when the named variable is not empty. Literal spaces, punctuation, quotes, slashes, and `#L` prefixes should be typed directly into the template.
 
 | Variable | Description |
 |---|---|
@@ -48,7 +54,7 @@ Templates are plain string replacement. There is no conditional syntax, and lite
 | `{lineRange}` | The selected line or line range, such as `5` or `5-10`. |
 | `{fileUri}` | Local file URI, such as `file:///Users/me/project/src/App.kt`. |
 
-When there is no editor caret or selection line, line variables are empty. If you often copy whole files from the Project tool window, create a separate profile without `#L{lineRange}` or `#L{startLine}`.
+When there is no editor caret or selection line, line variables are empty. The built-in profiles wrap line markers in optional sections, so copying a whole file does not leave a dangling `#L`.
 
 ## Usage
 
@@ -73,7 +79,7 @@ Open **Settings -> Tools -> Copy Path for Agent**.
 | Setting | Description | Default |
 |---|---|---|
 | Profile | Active copy configuration | `Claude Code` |
-| Template | Template used by the current profile | `@{relativePath}#L{lineRange}` |
+| Template | Template used by the current profile | `@{relativePath}{{#lineRange}}#L{lineRange}{{/lineRange}}` |
 | Multiple references separator | Separator for multi-file or multi-caret copies in the current profile | Space |
 | Show notification after copy | Toggle balloon notification | Enabled |
 | Notification duration | How long notifications stay visible | 3 seconds |
