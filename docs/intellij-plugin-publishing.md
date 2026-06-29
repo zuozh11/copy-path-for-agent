@@ -62,8 +62,26 @@ This project does not store the token in Gradle files. Keep using an environment
 
 - `./gradlew clean test buildPlugin` passes.
 - `README.md` matches the release behavior.
+- `CHANGELOG.md` describes the release.
 - `pluginVersion` is bumped.
 - `change-notes` in `plugin.xml` describe the release.
 - Git tag exists for the version.
 - GitHub Release includes the plugin ZIP from `build/distributions/`.
 - JetBrains Marketplace upload succeeds or is submitted for review.
+
+## 7. Push to GitHub
+
+Push the release commit:
+
+```bash
+git push origin main
+```
+
+If you create a release tag, make sure it points at the same commit as the release version:
+
+```bash
+git tag v<version>
+git push origin v<version>
+```
+
+Do not reuse an existing tag for a different commit.
