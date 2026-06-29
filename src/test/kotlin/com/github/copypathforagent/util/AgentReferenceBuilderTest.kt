@@ -6,95 +6,15 @@ import org.junit.Test
 class AgentReferenceBuilderTest {
 
     @Test
-    fun `claudecode preset file path only`() {
-        assertEquals("@src/Main.kt", AgentReferenceBuilder.build("src/Main.kt"))
-    }
-
-    @Test
-    fun `claudecode preset single line`() {
-        assertEquals("@src/Main.kt#L5", AgentReferenceBuilder.build("src/Main.kt", startLine = 5, endLine = 5))
-    }
-
-    @Test
-    fun `claudecode preset multiple lines`() {
-        assertEquals("@src/Main.kt#L5-10", AgentReferenceBuilder.build("src/Main.kt", startLine = 5, endLine = 10))
-    }
-
-    @Test
-    fun `claudecode preset path with spaces no line`() {
-        assertEquals("@\"my component.tsx\"", AgentReferenceBuilder.build("my component.tsx"))
-    }
-
-    @Test
-    fun `claudecode preset path with spaces range`() {
+    fun `claude code profile uses generic path and line range variables`() {
         assertEquals(
-            "@\"my component.tsx#L5-10\"",
-            AgentReferenceBuilder.build("my component.tsx", startLine = 5, endLine = 10)
+            "@src/Main.kt#L5-10",
+            AgentReferenceBuilder.build("src/Main.kt", startLine = 5, endLine = 10)
         )
     }
 
     @Test
-    fun `claudecode preset does not add directory slash by default`() {
-        val context = ReferenceContext(
-            relativePath = "src/main",
-            absolutePath = "/Users/example/project/src/main",
-            fileName = "main",
-            isDirectory = true
-        )
-
-        assertEquals("@src/main", AgentReferenceBuilder.build(context, FormatPreset.CLAUDE_CODE.template))
-    }
-
-    @Test
-    fun `custom template can add directory slash`() {
-        val context = ReferenceContext(
-            relativePath = "src/main",
-            absolutePath = "/Users/example/project/src/main",
-            fileName = "main",
-            isDirectory = true
-        )
-
-        assertEquals("@src/main/", AgentReferenceBuilder.build(context, "@{relativePathWithDirectorySlash}"))
-    }
-
-    @Test
-    fun `custom claude variable can add directory slash with quotes`() {
-        val context = ReferenceContext(
-            relativePath = "src/my components",
-            absolutePath = "/Users/example/project/src/my components",
-            fileName = "my components",
-            isDirectory = true
-        )
-
-        assertEquals("@\"src/my components/\"", AgentReferenceBuilder.build(context, "{claudeReferenceWithDirectorySlash}"))
-    }
-
-    @Test
-    fun `codex preset file path only`() {
-        val context = ReferenceContext(
-            relativePath = "src/Main.kt",
-            absolutePath = "/Users/example/project/src/Main.kt",
-            fileName = "Main.kt"
-        )
-
-        assertEquals("[Main.kt](/Users/example/project/src/Main.kt)", AgentReferenceBuilder.build(context, FormatPreset.CODEX.template))
-    }
-
-    @Test
-    fun `codex preset single line uses absolute path with start line`() {
-        val context = ReferenceContext(
-            relativePath = "src/Main.kt",
-            absolutePath = "/Users/example/project/src/Main.kt",
-            fileName = "Main.kt",
-            startLine = 5,
-            endLine = 5
-        )
-
-        assertEquals("[Main.kt:5](/Users/example/project/src/Main.kt:5)", AgentReferenceBuilder.build(context, FormatPreset.CODEX.template))
-    }
-
-    @Test
-    fun `codex preset range labels range and links to start line`() {
+    fun `codex app profile uses file uri and start line variables`() {
         val context = ReferenceContext(
             relativePath = "src/Main.kt",
             absolutePath = "/Users/example/project/src/Main.kt",
@@ -103,11 +23,14 @@ class AgentReferenceBuilderTest {
             endLine = 10
         )
 
-        assertEquals("[Main.kt:5-10](/Users/example/project/src/Main.kt:5)", AgentReferenceBuilder.build(context, FormatPreset.CODEX.template))
+        assertEquals(
+            "file:///Users/example/project/src/Main.kt#L5",
+            AgentReferenceBuilder.build(context, FormatPreset.CODEX.template)
+        )
     }
 
     @Test
-    fun `codex preset wraps target with angle brackets when path has spaces`() {
+    fun `codex app profile encodes spaces in file uri`() {
         val context = ReferenceContext(
             relativePath = "src/My Component.kt",
             absolutePath = "/Users/example/My Project/src/My Component.kt",
@@ -117,16 +40,43 @@ class AgentReferenceBuilderTest {
         )
 
         assertEquals(
-            "[My Component.kt:5-10](</Users/example/My Project/src/My Component.kt:5>)",
+            "file:///Users/example/My%20Project/src/My%20Component.kt#L5",
             AgentReferenceBuilder.build(context, FormatPreset.CODEX.template)
         )
     }
 
     @Test
-    fun `custom template can add trailing space through variable`() {
+    fun `codex app profile handles real style java path with selected range`() {
+        val context = ReferenceContext(
+            relativePath = "df-mdf-prd-productive-feignimpl/src/main/java/com/szlanyou/cloud/productive/feignclient/common/DbToolsVO.java",
+            absolutePath = "/Users/zuozhi/workspace/Lanyou/QX_SRM/df-mdf-prd-productive/df-mdf-prd-productive-feignimpl/src/main/java/com/szlanyou/cloud/productive/feignclient/common/DbToolsVO.java",
+            fileName = "DbToolsVO.java",
+            startLine = 76,
+            endLine = 77
+        )
+
         assertEquals(
-            "src/Main.kt line 5 ",
-            AgentReferenceBuilder.build("src/Main.kt", startLine = 5, endLine = 5, template = "{relativePath} {lineText}{space}")
+            "file:///Users/zuozhi/workspace/Lanyou/QX_SRM/df-mdf-prd-productive/df-mdf-prd-productive-feignimpl/src/main/java/com/szlanyou/cloud/productive/feignclient/common/DbToolsVO.java#L76",
+            AgentReferenceBuilder.build(context, FormatPreset.CODEX.template)
+        )
+    }
+
+    @Test
+    fun `custom template can compose minimal variables`() {
+        val context = ReferenceContext(
+            relativePath = "src/ui/Main.View.kt",
+            absolutePath = "/Users/example/project/src/ui/Main.View.kt",
+            fileName = "Main.View.kt",
+            startLine = 5,
+            endLine = 10
+        )
+
+        assertEquals(
+            "src/ui | /Users/example/project/src/ui | Main.View.kt | 5 | 10 | 5-10 | file:///Users/example/project/src/ui/Main.View.kt",
+            AgentReferenceBuilder.build(
+                context,
+                "{relativeDirectory} | {absoluteDirectory} | {fileName} | {startLine} | {endLine} | {lineRange} | {fileUri}"
+            )
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.github.copypathforagent.notification
 
+import com.github.copypathforagent.AgentBundle
 import com.github.copypathforagent.settings.AgentSettings
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
@@ -17,7 +18,7 @@ object AgentNotifier {
         val notification = NotificationGroupManager.getInstance()
             .getNotificationGroup("Copy Path for Agent")
             .createNotification(
-                "Copied Path for Agent",
+                AgentBundle.message("notification.title"),
                 reference,
                 NotificationType.INFORMATION
             )

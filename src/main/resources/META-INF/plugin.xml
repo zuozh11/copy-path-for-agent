@@ -2,27 +2,29 @@
     <id>com.github.copypathforagent</id>
     <name>Copy Path for Agent</name>
     <vendor email="zuozh11@users.noreply.github.com" url="https://github.com/zuozh11/copy-path-for-agent">zuozh11</vendor>
+    <resource-bundle>messages.AgentBundle</resource-bundle>
 
     <description><![CDATA[
 <h2>Copy Path for Agent</h2>
 <p>
     Copy file and folder references from JetBrains IDEs in configurable agent-friendly formats.
-    Use the built-in <b>claudecode</b> and <b>codex</b> presets, or define your own template.
+    Use switchable <b>profiles</b> for Claude Code, Codex App, and custom templates.
 </p>
 <ul>
     <li>Editor selections include line numbers based on the selected text.</li>
     <li>Multiple carets generate one reference per caret.</li>
     <li>Project tree multi-selection copies all selected files and folders.</li>
-    <li>Directory slashes are controlled by template variables such as <code>{directorySlash}</code>.</li>
-    <li>Multiple references can be separated by a space or newline.</li>
-    <li>Templates can use variables such as <code>{relativePath}</code>, <code>{absolutePath}</code>, <code>{directorySlash}</code>, <code>{claudeReference}</code>, and <code>{codexTarget}</code>.</li>
+    <li>Each profile keeps its own template and multiple-reference separator.</li>
+    <li>Profiles can be switched quickly from the status bar.</li>
+    <li>Templates use a small generic variable set for paths, directories, file names, line numbers, line ranges, and local file URIs.</li>
+    <li>The Codex App profile uses local <code>file://</code> URIs that match the agent client file protocol.</li>
 </ul>
 
-<h3>Presets</h3>
+<h3>Built-in Profiles</h3>
 <table>
-    <tr><th>Preset</th><th>Output</th></tr>
-    <tr><td>claudecode</td><td><code>@src/utils/auth.ts#L42-68</code></td></tr>
-    <tr><td>codex</td><td><code>[auth.ts:42-68](/absolute/path/src/utils/auth.ts:42)</code></td></tr>
+    <tr><th>Profile</th><th>Output</th></tr>
+    <tr><td>Claude Code</td><td><code>@src/utils/auth.ts#L42-68</code></td></tr>
+    <tr><td>Codex App</td><td><code>file:///absolute/path/src/utils/auth.ts#L42</code></td></tr>
 </table>
 
 <h3>How to Use</h3>
@@ -35,20 +37,22 @@
 <h3>Settings</h3>
 <p><b>Settings - Tools - Copy Path for Agent</b></p>
 <ul>
-    <li><b>Preset</b> - Choose <code>claudecode</code> or <code>codex</code> to fill the template.</li>
+    <li><b>Profile</b> - Switch between built-in and custom profiles.</li>
     <li><b>Template</b> - Customize the copied reference with documented variables.</li>
-    <li><b>Multiple references separator</b> - Space or newline.</li>
+    <li><b>Multiple references separator</b> - Stored per profile.</li>
     <li><b>Notification</b> - Toggle copy notifications and set their duration.</li>
 </ul>
     ]]></description>
 
     <change-notes><![CDATA[
-<h3>1.0.0</h3>
+<h3>1.1.1</h3>
 <ul>
-    <li>Forked from Copy Path for Claude Code and renamed to Copy Path for Agent.</li>
-    <li>Added configurable templates with documented variables.</li>
-    <li>Added claudecode and codex presets.</li>
-    <li>Removed hidden path suffix toggles; add <code>{space}</code> or <code>{directorySlash}</code> to the template if needed.</li>
+    <li>Reduced template variables to the minimal generic set: paths, directories, file name, line numbers, line range, and local file URI.</li>
+    <li>Removed derived variables such as file extension, extensionless file name, quoted paths, readable line text, and preformatted line suffixes.</li>
+    <li>Built-in profiles now compose Codex App and Claude Code output from the same generic variables.</li>
+    <li>Renamed the built-in profiles to <code>Claude Code</code> and <code>Codex App</code>.</li>
+    <li>Removed the preset selector from settings; profiles now directly own their templates.</li>
+    <li>Renamed the status bar widget text to <code>Copy Profile</code>.</li>
     <li>Kept editor selection, multi-caret, multi-file, folder, separator, shortcut, and notification features.</li>
 </ul>
     ]]></change-notes>
@@ -66,6 +70,8 @@
                 instance="com.github.copypathforagent.settings.AgentSettingsConfigurable"
                 id="com.github.copypathforagent.settings"
                 displayName="Copy Path for Agent"/>
+        <statusBarWidgetFactory
+                implementation="com.github.copypathforagent.status.AgentProfileStatusBarWidgetFactory"/>
     </extensions>
 
     <actions>

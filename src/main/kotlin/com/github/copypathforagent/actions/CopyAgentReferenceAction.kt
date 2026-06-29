@@ -1,5 +1,6 @@
 package com.github.copypathforagent.actions
 
+import com.github.copypathforagent.AgentBundle
 import com.github.copypathforagent.notification.AgentNotifier
 import com.github.copypathforagent.settings.AgentSettings
 import com.github.copypathforagent.util.AgentReferenceBuilder
@@ -35,7 +36,6 @@ class CopyAgentReferenceAction : AnAction() {
             relativePath = relativePath,
             absolutePath = absolutePath,
             fileName = file.name,
-            isDirectory = file.isDirectory,
             startLine = startLine,
             endLine = endLine
         )
@@ -89,7 +89,7 @@ class CopyAgentReferenceAction : AnAction() {
                 CopyPasteManager.getInstance().setContents(StringSelection(combined))
 
                 if (references.size > 1) {
-                    AgentNotifier.notify(project, "${references.size} references copied")
+                    AgentNotifier.notify(project, AgentBundle.message("notification.references", references.size))
                 } else {
                     AgentNotifier.notify(project, references.first())
                 }
@@ -107,7 +107,7 @@ class CopyAgentReferenceAction : AnAction() {
             }
             val combined = references.joinToString(getMultiFileSeparator())
             CopyPasteManager.getInstance().setContents(StringSelection(combined))
-            AgentNotifier.notify(project, "${references.size} paths copied")
+            AgentNotifier.notify(project, AgentBundle.message("notification.paths", references.size))
         } else {
             val virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
             val reference = buildReference(virtualFile, projectDir)
