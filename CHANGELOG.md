@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.4
+
+- Fixed Marketplace validation by declaring the status bar widget factory id in `plugin.xml`.
+
 ## 1.1.3
 
 - Changed the `Codex App` built-in profile to output Markdown file links that render as blue clickable references in Codex.

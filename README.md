@@ -4,7 +4,9 @@ A JetBrains plugin that copies file and folder references in configurable format
 
 It is forked from [Copy Path for Claude Code](https://github.com/inwpasit619/copy-path-for-claude-code) and keeps the original editor, project tree, multi-caret, multi-file, shortcut, and notification workflow while replacing the fixed Claude Code formatter with switchable profiles and templates.
 
-Current version: `1.1.3`.
+Current version: `1.1.4`.
+
+[JetBrains Marketplace](https://plugins.jetbrains.com/plugin/32535-copy-path-for-agent)
 
 ## Features
 
@@ -111,6 +113,28 @@ Restart the IDE after replacing the plugin files.
 ```
 
 The plugin ZIP is generated under `build/distributions/`.
+
+## Marketplace Embeddables
+
+Plugin card:
+
+```html
+<script src="https://plugins.jetbrains.com/assets/scripts/mp-widget.js"></script>
+<script>
+  // Please, replace #yourelement with a real element id on your webpage
+  MarketplaceWidget.setupMarketplaceWidget('card', 32535, "#yourelement");
+</script>
+```
+
+Install button:
+
+```html
+<script src="https://plugins.jetbrains.com/assets/scripts/mp-widget.js"></script>
+<script>
+  // Please, replace #yourelement with a real element id on your webpage
+  MarketplaceWidget.setupMarketplaceWidget('install', 32535, "#yourelement");
+</script>
+```
 
 ## Compatibility
 
